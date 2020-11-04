@@ -1,10 +1,14 @@
 from flask import Flask
+from wsgiref.simple_server import make_server
 
-def create_app():
-    app = Flask(__name__)
+app = Flask(__name__)
 
-    @app.route("/api/v1/hello-world-<id>", methods=["GET"])
-    def printHello(id):
-        return "Hello World "+id
 
-    return app
+@app.route('/api/v1/hello-world-25')
+def hello():
+    return 'Hello World 25'
+
+
+server = make_server('', 8000, app)
+print('http://127.0.0.1:8000/api/v1/hello-world-25')
+server.serve_forever()
