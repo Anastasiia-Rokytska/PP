@@ -1,0 +1,599 @@
+openapi: 3.0.0
+info:
+  version: '1'
+  title: Playlist Application
+  description: >-
+    Service for playlists creating. Users can create both public and private
+    playlists. Besides, public playlists can be changed by everyone.
+
+
+servers:
+  # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Pasemko/PlaylistAPI/1
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Pasemko/Playlist/1
+
+
+
+tags: 
+  - name: user
+    description: Operations about user
+    externalDocs:
+      description: Find out more
+      url: ''
+  
+  - name: forum
+    description: Operations about forum
+    externalDocs:
+      description: Find out more
+      url: ''
+  
+  - name: playlist
+    description: Everything about playlist
+    externalDocs:
+      description: Find out more
+      url: ''
+
+
+
+paths:
+  /playlist:
+    post:
+      tags:
+        - playlist
+      
+      summary: Create a new pleylist
+      operationId: addPlaylist
+      responses:
+        '405':
+          description: Invalid input
+      
+      security:
+        - playlist_auth:
+          - 'write:playlists'
+          - 'read:pets'
+      
+      requestBody:
+        $ref: '#/components/requestBodies/Playlist'
+    
+    
+    put:
+      tags:
+        - playlist
+      
+      summary: Update an existing playlist
+      operationId: updatePlaylist
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Playlist not found
+        '405':
+          description: Validation exeption
+      
+      security:
+        - playlist_auth:
+          - 'write:playlists'
+          - 'read:pets'
+      
+      requestBody:
+        $ref: '#/components/requestBodies/Playlist'
+    
+    
+    get:
+      tags:
+        - playlist
+      
+      summary: show all of the existing and aviable playlists
+      operationId: showPlaylists
+      responses:
+        '200':
+          description: successful operation
+        '404':
+          description: Playlists not found
+  
+  
+  /playlist/findByParameter:
+    get:
+      tags:
+        - playlist
+      
+      summary: Find playlists by parameter
+      description: Multiple parameter values can be provided with comma separated strings
+      
+      operationId: findPlaylistByParameter
+      parameters:
+        - name: parameter
+          in: query
+          description: Parameter values that need to be considered for filter
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - name
+                - name_of_composition
+                - owner_name
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Playlist'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Playlist'
+        '400':
+          description: Invalid status value
+        '404':
+          description: Playlist not found
+  
+  
+  '/playlist/{playlistId}':
+    get:
+      tags:
+        - playlist
+      summary: Find playlist by ID
+      description: Returns a single playlist
+      operationId: getPlaylistById
+      parameters:
+        - name: playlistId
+          in: path
+          description: ID of playlist to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Playlist'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Playlist'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Playlist not found
+      security:
+        - api_key: []
+    
+    post:
+      tags:
+        - playlist
+      summary: Updates a playlist with form data
+      operationId: updatePlaylistWithForm
+      parameters:
+        - name: playlistId
+          in: path
+          description: ID of playlist that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+        '405':
+          description: Invalid input
+      
+      security:
+        - playlist_auth:
+          - 'write:playlists'
+          - 'read:pets'
+      
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: Updated name of the playlist
+                  type: string
+                status:
+                  description: Updated parameters of the playlist
+                  type: string
+    
+    delete:
+      tags:
+        - playlist
+      summary: Deletes a playlist
+      operationId: deletePlaylist
+      parameters:
+        - name: api_key
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: playlistId
+          in: path
+          description: Playlist id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Playlist not found
+      
+      security:
+        - playlist_auth:
+          - 'write:playlists'
+          - 'read:pets'
+  
+  
+  /forum:
+    get:
+      tags:
+        - forum
+      
+      description: Returns all information about users and playlists
+      responses:
+        '200':
+          description: successful operation
+  
+  
+  /user:
+    post:
+      tags:
+        - user
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      
+      parameters:
+        - name: username
+          in: query
+          description: Creat username
+          required: true
+          schema:
+            type: string
+        
+        - name: firstName
+          in: query
+          description: Your name
+          required: true
+          schema:
+            type: string
+        
+        - name: lastName
+          in: query
+          description: Your surname
+          required: true
+          schema:
+            type: string
+        
+        - name: email
+          in: query
+          description: Your email
+          schema:
+            type: string
+        
+        - name: phone
+          in: query
+          description: Your phone number
+          schema:
+            type: string
+        
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string
+      
+      responses:
+        '200':
+          description: successful operation
+        '405':
+          description: Invalid input
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+        
+        description: Created user object
+        required: true
+    
+    get:
+      tags:
+        - user
+      
+      summary: show all users
+      operationId: showUsers
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requestBodies/UserArray'
+            application/xml:
+              schema:
+                $ref: '#/components/requestBodies/UserArray'
+        '404':
+          description: User not found
+  
+  
+  /user/login:
+    get:
+      tags:
+        - user
+      
+      summary: Logs user into the system
+      operationId: loginUser
+      
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string
+      
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+  
+  
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logs out current logged in user session
+      operationId: logoutUser
+      responses:
+        default:
+          description: successful operation
+  
+  
+  '/user/{username}':
+    get:
+      tags:
+        - user
+      summary: Get user by user name
+      operationId: getUserByName
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be fetched. Use user1 for testing.
+          required: true
+          schema:
+            type: string
+      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    
+    
+    put:
+      tags:
+        - user
+      summary: Updated user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: username
+          in: path
+          description: name that need to be updated
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid user supplied
+        '404':
+          description: User not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Updated user object
+        required: true
+    
+    
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+
+
+components:
+  schemas:
+    Song:
+      type: object
+      
+      required:
+        - name
+        - name_of_author
+        - text
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        name_of_author:
+          type: string
+        text:
+          type: string
+      
+      xml:
+        name: Song
+    
+    
+    Playlist:
+      type: object
+      
+      required: 
+        - name
+        - songs
+        - is_private
+        
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        songs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Song'
+            
+        is_private:
+          type: boolean
+          description: if playlist is aviable to see and change by others users
+      
+        
+      xml:
+        name: Playlist
+    
+    
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        phone:
+          type: string
+        userStatus:
+          type: integer
+          format: int32
+          description: User Status
+      xml:
+        name: User
+  
+  
+  requestBodies:
+    Playlist:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Playlist'
+        
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Playlist'
+      
+      description: Playlist object that needs to be added to the forum or user account
+      
+      required: true
+    
+    
+    UserArray:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+        
+        application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+      
+      description: List of user object
+      required: true
+  
+  securitySchemes:
+    playlist_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: ''
+          scopes:
+            'write:playlists': modify playlists in your account
+            'read:pets': read your playlists
+  
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
