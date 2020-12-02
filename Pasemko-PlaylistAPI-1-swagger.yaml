@@ -17,19 +17,19 @@ servers:
 
 
 
-tags: 
+tags:
   - name: user
     description: Operations about user
     externalDocs:
       description: Find out more
       url: ''
-  
+
   - name: forum
     description: Operations about forum
     externalDocs:
       description: Find out more
       url: ''
-  
+
   - name: playlist
     description: Everything about playlist
     externalDocs:
@@ -43,26 +43,26 @@ paths:
     post:
       tags:
         - playlist
-      
+
       summary: Create a new pleylist
       operationId: addPlaylist
       responses:
         '405':
           description: Invalid input
-      
+
       security:
         - playlist_auth:
-          - 'write:playlists'
-          - 'read:pets'
-      
+            - 'write:playlists'
+            - 'read:pets'
+
       requestBody:
         $ref: '#/components/requestBodies/Playlist'
-    
-    
+
+
     put:
       tags:
         - playlist
-      
+
       summary: Update an existing playlist
       operationId: updatePlaylist
       responses:
@@ -74,20 +74,20 @@ paths:
           description: Playlist not found
         '405':
           description: Validation exeption
-      
+
       security:
         - playlist_auth:
-          - 'write:playlists'
-          - 'read:pets'
-      
+            - 'write:playlists'
+            - 'read:pets'
+
       requestBody:
         $ref: '#/components/requestBodies/Playlist'
-    
-    
+
+
     get:
       tags:
         - playlist
-      
+
       summary: show all of the existing and aviable playlists
       operationId: showPlaylists
       responses:
@@ -95,16 +95,16 @@ paths:
           description: successful operation
         '404':
           description: Playlists not found
-  
-  
+
+
   /playlist/findByParameter:
     get:
       tags:
         - playlist
-      
+
       summary: Find playlists by parameter
       description: Multiple parameter values can be provided with comma separated strings
-      
+
       operationId: findPlaylistByParameter
       parameters:
         - name: parameter
@@ -138,8 +138,8 @@ paths:
           description: Invalid status value
         '404':
           description: Playlist not found
-  
-  
+
+
   '/playlist/{playlistId}':
     get:
       tags:
@@ -170,8 +170,8 @@ paths:
         '404':
           description: Playlist not found
       security:
-        - api_key: []
-    
+        - api_key: [ ]
+
     post:
       tags:
         - playlist
@@ -190,12 +190,12 @@ paths:
           description: successful operation
         '405':
           description: Invalid input
-      
+
       security:
         - playlist_auth:
-          - 'write:playlists'
-          - 'read:pets'
-      
+            - 'write:playlists'
+            - 'read:pets'
+
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -208,7 +208,7 @@ paths:
                 status:
                   description: Updated parameters of the playlist
                   type: string
-    
+
     delete:
       tags:
         - playlist
@@ -234,24 +234,24 @@ paths:
           description: Invalid ID supplied
         '404':
           description: Playlist not found
-      
+
       security:
         - playlist_auth:
-          - 'write:playlists'
-          - 'read:pets'
-  
-  
+            - 'write:playlists'
+            - 'read:pets'
+
+
   /forum:
     get:
       tags:
         - forum
-      
+
       description: Returns all information about users and playlists
       responses:
         '200':
           description: successful operation
-  
-  
+
+
   /user:
     post:
       tags:
@@ -259,7 +259,7 @@ paths:
       summary: Create user
       description: This can only be done by the logged in user.
       operationId: createUser
-      
+
       parameters:
         - name: username
           in: query
@@ -267,40 +267,40 @@ paths:
           required: true
           schema:
             type: string
-        
+
         - name: firstName
           in: query
           description: Your name
           required: true
           schema:
             type: string
-        
+
         - name: lastName
           in: query
           description: Your surname
           required: true
           schema:
             type: string
-        
+
         - name: email
           in: query
           description: Your email
           schema:
             type: string
-        
+
         - name: phone
           in: query
           description: Your phone number
           schema:
             type: string
-        
+
         - name: password
           in: query
           description: The password for login in clear text
           required: true
           schema:
             type: string
-      
+
       responses:
         '200':
           description: successful operation
@@ -311,18 +311,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
-          
+
           application/xml:
             schema:
               $ref: '#/components/schemas/User'
-        
+
         description: Created user object
         required: true
-    
+
     get:
       tags:
         - user
-      
+
       summary: show all users
       operationId: showUsers
       responses:
@@ -337,16 +337,16 @@ paths:
                 $ref: '#/components/requestBodies/UserArray'
         '404':
           description: User not found
-  
-  
+
+
   /user/login:
     get:
       tags:
         - user
-      
+
       summary: Logs user into the system
       operationId: loginUser
-      
+
       parameters:
         - name: username
           in: query
@@ -360,7 +360,7 @@ paths:
           required: true
           schema:
             type: string
-      
+
       responses:
         '200':
           description: successful operation
@@ -384,8 +384,8 @@ paths:
                 type: string
         '400':
           description: Invalid username/password supplied
-  
-  
+
+
   /user/logout:
     get:
       tags:
@@ -395,8 +395,8 @@ paths:
       responses:
         default:
           description: successful operation
-  
-  
+
+
   '/user/{username}':
     get:
       tags:
@@ -410,7 +410,7 @@ paths:
           required: true
           schema:
             type: string
-      
+
       responses:
         '200':
           description: successful operation
@@ -425,8 +425,8 @@ paths:
           description: Invalid username supplied
         '404':
           description: User not found
-    
-    
+
+
     put:
       tags:
         - user
@@ -452,8 +452,8 @@ paths:
               $ref: '#/components/schemas/User'
         description: Updated user object
         required: true
-    
-    
+
+
     delete:
       tags:
         - user
@@ -478,7 +478,7 @@ components:
   schemas:
     Song:
       type: object
-      
+
       required:
         - name
         - name_of_author
@@ -493,19 +493,19 @@ components:
           type: string
         text:
           type: string
-      
+
       xml:
         name: Song
-    
-    
+
+
     Playlist:
       type: object
-      
-      required: 
+
+      required:
         - name
         - songs
         - is_private
-        
+
       properties:
         id:
           type: integer
@@ -516,16 +516,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Song'
-            
+
         is_private:
           type: boolean
           description: if playlist is aviable to see and change by others users
-      
-        
+        owner_id:
+          type: integer
+          format: int64
+
       xml:
         name: Playlist
-    
-    
+
+
     User:
       type: object
       properties:
@@ -550,24 +552,24 @@ components:
           description: User Status
       xml:
         name: User
-  
-  
+
+
   requestBodies:
     Playlist:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Playlist'
-        
+
         application/xml:
           schema:
             $ref: '#/components/schemas/Playlist'
-      
+
       description: Playlist object that needs to be added to the forum or user account
-      
+
       required: true
-    
-    
+
+
     UserArray:
       content:
         application/json:
@@ -575,14 +577,14 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/User'
-        
+
         application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-      
+          schema:
+            $ref: '#/components/schemas/User'
+
       description: List of user object
       required: true
-  
+
   securitySchemes:
     playlist_auth:
       type: oauth2
@@ -592,7 +594,7 @@ components:
           scopes:
             'write:playlists': modify playlists in your account
             'read:pets': read your playlists
-  
+
     api_key:
       type: apiKey
       name: api_key
