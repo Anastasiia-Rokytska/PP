@@ -2,26 +2,17 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine("postgresql://postgres:gcBwYK@localhost/lab")
+engine = create_engine('postgres://postgres:nastya@localhost:5432/postgres')
+
 db_session = scoped_session(sessionmaker(bind=engine))
 
 Base = declarative_base()
 
 
-class Users(Base):
-    __tablename__ = "users"
-
-    id = Column(Integer, primary_key=True)
-    username = Column(String, nullable=False)
-    first_name = Column(String)
-    last_name = Column(String)
-    email = Column(String)
-    password = Column(String)
-    phone = Column(String)
-    user_status = Column(Integer)
-
-    def __repr__(self):
-        return f"<User {self.username} ({self.first_name} {self.last_name}), email: {self.email}>"
+users_playlists = Table("users_playlists",
+                       Base.metadata,
+                       Column("id", Integer(), ForeignKey("users.id")),
+                       Column("playlist_id", Integer(), ForeignKey("playlists.id")))
 
 
 playlist_songs = Table("playlist_songs",
@@ -51,8 +42,24 @@ class Playlists(Base):
 
     is_private = Column(Boolean)
 
-    owner_id = Column(Integer, ForeignKey(Users.id))
-    owner = relationship(Users, backref="playlists", lazy=False)
+    # owner_id = Column(Integer, ForeignKey(Users.id))
+    # owner = relationship(Users, backref="playlists", lazy=False)
 
     def __repr__(self):
         return f"<Playlist '{self.name}', owner: {self.owner}, songs: {self.songs}>"
+
+
+class Users(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String, nullable=False)
+    first_name = Column(String)
+    last_name = Column(String)
+    email = Column(String)
+    password = Column(String)
+    phone = Column(String)
+    playlists = relationship(Playlists, secondary=users_playlists, lazy="subquery",
+                          backref=backref("Playlists", lazy=True))
+    def __repr__(self):
+        return f"<User {self.username} ({self.first_name} {self.last_name}), email: {self.email}>"

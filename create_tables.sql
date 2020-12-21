@@ -25,8 +25,8 @@ CREATE TABLE playlists
     id         SERIAL  NOT NULL,
     name       VARCHAR NOT NULL,
     is_private BOOLEAN NOT NULL,
-    owner_id   INTEGER NOT NULL,
-    FOREIGN KEY (owner_id) REFERENCES users (id),
+--     owner_id   INTEGER NOT NULL,
+--     FOREIGN KEY(owner_id)  REFERENCES users (id) ON DELETE CASCADE,
     PRIMARY KEY (id)
 );
 
@@ -38,3 +38,11 @@ CREATE TABLE playlist_songs
     FOREIGN KEY (playlist_id) REFERENCES playlists (id),
     FOREIGN KEY (song_id) REFERENCES songs (id)
 );
+
+CREATE TABLE users_playlists(
+  id INTEGER,
+  playlist_id INTEGER,
+  FOREIGN KEY (id) REFERENCES users(id),
+  FOREIGN KEY (playlist_id) REFERENCES playlists(id)
+);
+

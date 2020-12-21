@@ -1,4 +1,4 @@
-from models import db_session, Users, Songs, Playlists
+from model import db_session, Users, Songs, Playlists
 
 session = db_session()
 

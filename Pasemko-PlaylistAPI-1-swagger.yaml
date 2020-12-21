@@ -24,56 +24,59 @@ tags:
       description: Find out more
       url: ''
 
-  - name: forum
-    description: Operations about forum
-    externalDocs:
-      description: Find out more
-      url: ''
-
   - name: playlist
     description: Everything about playlist
     externalDocs:
       description: Find out more
       url: ''
 
+  - name: song
+    description: Everything about song
+    externalDocs:
+      description: Find out more
+      url: ''
+
+
 
 
 paths:
-  /playlist:
+  /songs:
     post:
       tags:
-        - playlist
+        - song
 
-      summary: Create a new pleylist
-      operationId: addPlaylist
+      summary: Add a new song
+      operationId: addSong
       responses:
         '405':
           description: Invalid input
 
-      security:
-        - playlist_auth:
-            - 'write:playlists'
-            - 'read:pets'
-
       requestBody:
-        $ref: '#/components/requestBodies/Playlist'
+        $ref: '#/components/requestBodies/Song'
 
-
-    put:
+    get:
       tags:
-        - playlist
+        - song
 
-      summary: Update an existing playlist
-      operationId: updatePlaylist
+      summary: show all of the existing and aviable songs
+      operationId: showSongs
       responses:
         '200':
           description: successful operation
-        '400':
-          description: Invalid ID supplied
         '404':
-          description: Playlist not found
+          description: Songs not found
+
+
+  /playlists:
+    post:
+      tags:
+        - playlist
+
+      summary: Create a new playlist
+      operationId: addPlaylist
+      responses:
         '405':
-          description: Validation exeption
+          description: Invalid input
 
       security:
         - playlist_auth:
@@ -97,50 +100,38 @@ paths:
           description: Playlists not found
 
 
-  /playlist/findByParameter:
+  /playlists/findByName:
     get:
       tags:
         - playlist
-
-      summary: Find playlists by parameter
-      description: Multiple parameter values can be provided with comma separated strings
-
-      operationId: findPlaylistByParameter
+      summary: Find playlist by ID
+      description: Returns a single playlist
+      operationId: getPlaylistByName
       parameters:
-        - name: parameter
+        - name: name
           in: query
-          description: Parameter values that need to be considered for filter
+          description: Name of playlist to return
           required: true
-          explode: true
           schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - name
-                - name_of_composition
-                - owner_name
+            type: string
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Playlist'
+                $ref: '#/components/schemas/Playlist'
             application/xml:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Playlist'
+                $ref: '#/components/schemas/Playlist'
         '400':
-          description: Invalid status value
+          description: Invalid Name supplied
         '404':
           description: Playlist not found
+      security:
+        - api_key: [ ]
 
-
-  '/playlist/{playlistId}':
+  '/playlists/{playlistId}':
     get:
       tags:
         - playlist
@@ -172,7 +163,7 @@ paths:
       security:
         - api_key: [ ]
 
-    post:
+    put:
       tags:
         - playlist
       summary: Updates a playlist with form data
@@ -241,18 +232,8 @@ paths:
             - 'read:pets'
 
 
-  /forum:
-    get:
-      tags:
-        - forum
 
-      description: Returns all information about users and playlists
-      responses:
-        '200':
-          description: successful operation
-
-
-  /user:
+  /users:
     post:
       tags:
         - user
@@ -339,7 +320,7 @@ paths:
           description: User not found
 
 
-  /user/login:
+  /users/login:
     get:
       tags:
         - user
@@ -386,7 +367,7 @@ paths:
           description: Invalid username/password supplied
 
 
-  /user/logout:
+  /users/logout:
     get:
       tags:
         - user
@@ -397,7 +378,7 @@ paths:
           description: successful operation
 
 
-  '/user/{username}':
+  '/users/{username}':
     get:
       tags:
         - user
@@ -546,10 +527,6 @@ components:
           type: string
         phone:
           type: string
-        userStatus:
-          type: integer
-          format: int32
-          description: User Status
       xml:
         name: User
 
@@ -568,6 +545,21 @@ components:
       description: Playlist object that needs to be added to the forum or user account
 
       required: true
+
+    Song:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Song'
+
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Song'
+
+      description: Add songs
+
+      required: true
+
 
 
     UserArray:
