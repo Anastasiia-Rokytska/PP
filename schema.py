@@ -28,7 +28,8 @@ class PlaylistsSchema(Schema):
     name = fields.Str()
     is_private = fields.Bool()
     # owner_id = fields.Int()
-    songs = fields.List(fields.Nested(SongsSchema(only=('id',))))
+    songs = fields.List(fields. Nested(SongsSchema(only=('id',))))
+
     @post_load
     def create_playlist(self, data, **kwargs):
         return Playlists(**data)
