@@ -1,8 +1,11 @@
 from model import db_session, Users, Songs, Playlists
+from app import bcrypt
+
+# psql -h localhost -d postgres -U postgres -p 5432 -a -q -f create_tables.sql
 
 session = db_session()
 
-user_1 = Users(id=1, username="Test1", email="test@test.com", first_name="TestName", password="testpass1")
+user_1 = Users(id=1, username="Test1", email="test@test.com", first_name="TestName", password=bcrypt.generate_password_hash("admin").decode('utf-8'))
 
 song_1 = Songs(id=1, name="1st song", name_of_author="AuthorName", text="qwertyuiop")
 song_2 = Songs(id=2, name="2nd song", name_of_author="2AuthorName", text="asdfghjkl")
