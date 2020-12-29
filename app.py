@@ -1,8 +1,6 @@
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify
 from schema import *
-from wtforms import ValidationError
 from flask_bcrypt import Bcrypt
-from flask_session import Session
 from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
@@ -13,7 +11,6 @@ auth = HTTPBasicAuth()
 
 @auth.verify_password
 def verify_password(username, password):
-
     user = session.query(Users).filter(Users.username == username).one_or_none()
     if user is None:
         return False
@@ -63,10 +60,8 @@ def delete_user(username):
 @app.route('/users', methods=['GET'])
 def get_users():
     users_list = session.query(Users)
-    if users_list:
-        return jsonify(UsersSchema(exclude=['password'], many=True).dump(users_list))
-    else:
-        return 'There is no users'
+
+    return jsonify(UsersSchema(exclude=['password'], many=True).dump(users_list))
 
 
 @app.route('/users/<username>', methods=['PUT'])
@@ -86,9 +81,10 @@ def update_user(username):
     user.first_name = data['first_name'] if 'first_name' in data else user.first_name
     user.last_name = data['last_name'] if 'last_name' in data else user.last_name
     user.phone = data['phone'] if 'phone' in data else user.phone
-    user.password = bcrypt.generate_password_hash(data['password']).decode('utf-8') if 'password' in data else user.password
+    user.password = bcrypt.generate_password_hash(data['password']).decode(
+        'utf-8') if 'password' in data else user.password
     user.email = data['email'] if 'email' in data else user.email
-    user.playlists=playlists
+    user.playlists = playlists
 
     session.commit()
     user_schema = UsersSchema(exclude=['password'])
@@ -99,15 +95,11 @@ def update_user(username):
 @app.route('/songs', methods=['GET'])
 def get_songs():
     songs_list = session.query(Songs)
-    if songs_list:
-        return jsonify(SongsSchema(many=True).dump(songs_list))
-    else:
-        return 'There is no songs'
+    return jsonify(SongsSchema(many=True).dump(songs_list))
 
 
 @app.route('/songs', methods=['POST'])
 def add_song():
-
     data = request.get_json()
 
     new_song = Songs(id=data['id'], name=data['name'], name_of_author=data['name_of_author'], text=data['text'])
@@ -126,15 +118,10 @@ def create_playlist():
         if song not in songs:
             songs.append(song)
 
-    new_playlist = Playlists(id=data['id'], name=data['name'], is_private=data['is_private'], songs=songs, owner_id=auth.current_user().id)
-    #return f'{data["owner_id"]}'
-    user = session.query(Users).filter_by(id=auth.current_user().id).one_or_none()
-    # print(user)
+    user = auth.current_user()
 
-    if user is None:
-        return jsonify({'message': "User is not found", "code": 404}), 404
-    if auth.username() != user.username:
-        return 'Access error', 401
+    new_playlist = Playlists(id=data['id'], name=data['name'], is_private=data['is_private'], songs=songs,
+                             owner_id=user.id)
 
     user.playlists.append(new_playlist)
 
@@ -158,10 +145,7 @@ def get_playlists():
             if i.is_private and i.owner_id == user.id and i not in playlists:
                 playlists.append(i)
 
-    if playlists_list:
-        return jsonify(PlaylistsSchema(many=True).dump(playlists))
-    else:
-        return 'There is no playlists'
+    return jsonify(PlaylistsSchema(many=True).dump(playlists))
 
 
 @app.route('/playlists/<playlist_id>', methods=['DELETE'])
@@ -188,7 +172,7 @@ def get_playlist(playlists_id):
     playlists_schema = PlaylistsSchema()
     if playlist.is_private and (
             not auth.current_user() or (auth.current_user() and playlist.owner_id != auth.current_user().id)):
-        return 'Access is not available'
+        return 'Access is not available', 401
 
     return playlists_schema.dump(playlist)
 
@@ -203,7 +187,7 @@ def get_playlistbyp():
         playlists_schema = PlaylistsSchema()
         if playlist.is_private and (
                 not auth.current_user() or (auth.current_user() and playlist.owner_id != auth.current_user().id)):
-            return 'Access is not available'
+            return 'Access is not available', 401
 
         return playlists_schema.dump(playlist)
     else:
@@ -219,7 +203,7 @@ def update_playlist(playlist_id):
 
     if playlist.is_private and (
             not auth.current_user() or (auth.current_user() and playlist.owner_id != auth.current_user().id)):
-        return 'Access is not available'
+        return 'Access is not available', 401
 
     data = request.get_json()
     songs = []
@@ -238,8 +222,6 @@ def update_playlist(playlist_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
 
 '''
 ___USER___
@@ -309,4 +291,3 @@ curl --user admin:admin --request PUT http://127.0.0.1:5000/playlists/3 -H "Cont
 
 
 '''
-
