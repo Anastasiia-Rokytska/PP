@@ -3,7 +3,7 @@ import os
 
 sys.path.insert(0, os.path.split(os.path.dirname(__file__))[0])
 
-from models import Base
+from model import Base
 
 from logging.config import fileConfig
 
